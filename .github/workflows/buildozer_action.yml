@@ -95,7 +95,7 @@ jobs:
             libffi-dev \
             libssl-dev \
             automake \
-            gettext
+            autopoint
 
       # Set up Java 17 required by Gradle
       - name: Setup Java 17 required by Gradle
