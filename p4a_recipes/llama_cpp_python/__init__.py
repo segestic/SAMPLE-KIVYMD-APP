@@ -1,12 +1,9 @@
 from pythonforandroid.recipe import CompiledComponentsPythonRecipe
-from os import environ
 
 class LlamaCppPythonRecipe(CompiledComponentsPythonRecipe):
     """
     Recipe for compiling llama-cpp-python.
-    This version correctly identifies scikit-build-core as a build dependency
-    and disables incompatible native optimizations, plus strips any
-    stray '-march=native' from the toolchain flags.
+    This version applies a patch to remove the incompatible '-march=native' flag.
     """
     
     version = '0.2.20'
@@ -14,17 +11,17 @@ class LlamaCppPythonRecipe(CompiledComponentsPythonRecipe):
     name = 'llama-cpp-python'
     
     depends = ['numpy', 'typing_extensions', 'diskcache', 'scikit-build-core']
+    
+    # --- THIS IS THE FIX ---
+    # Apply the patch file we just created.
+    patches = ['disable_native.patch']
+    
     site_packages_name = 'llama_cpp'
 
     def get_recipe_env(self, arch):
         env = super().get_recipe_env(arch)
-
-        # --- Remove any '-march=native' accidentally injected by the NDK toolchain ---
-        for flag_var in ('CFLAGS', 'CXXFLAGS', 'LDFLAGS'):
-            if flag_var in env:
-                parts = env[flag_var].split()
-                env[flag_var] = ' '.join(p for p in parts if p != '-march=native')
-
+        
+        # We no longer need LLAMA_NATIVE=OFF, but the other flags are still good.
         cmake_args = [
             '-DCMAKE_BUILD_TYPE=Release',
             '-DLLAMA_CUBLAS=OFF',
@@ -33,13 +30,11 @@ class LlamaCppPythonRecipe(CompiledComponentsPythonRecipe):
             '-DLLAMA_BUILD_SERVER=OFF',
             '-DLLAMA_BUILD_TESTS=OFF',
             '-DLLAMA_BUILD_EXAMPLES=OFF',
-            '-DLLAMA_NATIVE=OFF',      # disable llama.cpp's own native optimizations
         ]
-
-        env['CMAKE_ARGS'] = ' '.join(cmake_args)
-        # also export to the global environ so subprocesses see it
-        environ['CMAKE_ARGS'] = env['CMAKE_ARGS']
+        
+        env['SKBUILD_CMAKE_ARGS'] = ' '.join(cmake_args)
+        
         return env
 
-# instantiate the recipe
+# This line is essential
 recipe = LlamaCppPythonRecipe()
