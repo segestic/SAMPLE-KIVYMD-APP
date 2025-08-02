@@ -7,7 +7,8 @@ class LlamaCppPythonRecipe(CompiledComponentsPythonRecipe):
     """
     
     # The URL now points directly to your fixed zip file.
-    url = 'https://github.com/segestic/llama-cpp-python/releases/download/v0.2.20/llama-cpp-python.zip'
+    #url = 'https://github.com/segestic/llama-cpp-python/releases/download/v0.2.20/llama-cpp-python.zip'
+    url = 'https://github.com/segestic/llama-cpp-python/releases/download/v0.2.20/llama-cpp-python-0.2.20.zip'
     
     # The name, version, and dependencies are still needed.
     name = 'llama-cpp-python'
