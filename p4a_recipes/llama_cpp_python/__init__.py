@@ -2,38 +2,18 @@ from pythonforandroid.recipe import CompiledComponentsPythonRecipe
 
 class LlamaCppPythonRecipe(CompiledComponentsPythonRecipe):
     """
-    Definitive recipe for compiling llama-cpp-python.
-    This version uses the correct GGML_NATIVE flag to disable
-    incompatible host-specific optimizations.
+    Final recipe. Builds llama-cpp-python from a pre-patched
+    source zip provided by a direct URL.
     """
-
-    version = '0.2.20'
-    url = f'https://github.com/abetlen/llama-cpp-python/archive/refs/tags/v{version}.tar.gz'
+    
+    # The URL now points directly to your fixed zip file.
+    url = 'https://github.com/segestic/llama-cpp-python/releases/download/v0.2.20/llama-cpp-python.zip'
+    
+    # The name, version, and dependencies are still needed.
     name = 'llama-cpp-python'
-
+    version = '0.2.20'
     depends = ['numpy', 'typing_extensions', 'diskcache', 'scikit-build-core']
-
     site_packages_name = 'llama_cpp'
 
-    def get_recipe_env(self, arch):
-        env = super().get_recipe_env(arch)
-
-        cmake_args = [
-            '-DCMAKE_BUILD_TYPE=Release',
-            '-DLLAMA_CUBLAS=OFF',
-            '-DLLAMA_METAL=OFF',
-            '-DLLAMA_CLBLAST=OFF',
-            '-DLLAMA_BUILD_SERVER=OFF',
-            '-DLLAMA_BUILD_TESTS=OFF',
-            '-DLLAMA_BUILD_EXAMPLES=OFF',
-            # --- THIS IS THE CORRECT FLAG ---
-            '-DGGML_NATIVE=OFF',
-        ]
-
-        # Use the specific environment variable for scikit-build-core
-        env['SKBUILD_CMAKE_ARGS'] = ' '.join(cmake_args)
-
-        return env
-
-# This line is essential
+# This is the entire recipe.
 recipe = LlamaCppPythonRecipe()
