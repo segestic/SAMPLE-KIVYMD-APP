@@ -13,7 +13,7 @@ package.domain = org.novfensec
 source.dir = .
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,png,jpg,kv,atlas
+source.include_exts = py,png,jpg,kv,atlas,so
 
 # (list) List of inclusions using pattern matching
 source.include_patterns = images/*.png
@@ -37,7 +37,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3, kivy==2.3.1, https://github.com/kivymd/KivyMD/archive/master.zip, exceptiongroup, asynckivy, asyncgui, materialyoucolor, android, llama-cpp-python>=0.2.20, numpy, pandas, psutil, codecarbon, pynvml, huggingface_hub
+requirements = python3, kivy==2.3.1, https://github.com/kivymd/KivyMD/archive/master.zip, https://github.com/segestic/llama.cpp/releases/download/b5904/llama_cpp_python-0.2.20-cp311-cp311-linux_aarch64.whl, exceptiongroup, asynckivy, asyncgui, materialyoucolor, android, numpy, pandas, codecarbon, pynvml, huggingface_hub
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -321,7 +321,7 @@ android.debug_artifact = apk
 #p4a.fork = kivy
 
 # (str) python-for-android branch to use, defaults to master
-p4a.branch = develop
+p4a.branch = master
 
 # (str) python-for-android specific commit to use, defaults to HEAD, must be within p4a.branch
 #p4a.commit = HEAD
@@ -450,3 +450,4 @@ warn_on_root = 1
 #    Then, invoke the command line with the "demo" profile:
 #
 #buildozer --profile demo android debug
+
