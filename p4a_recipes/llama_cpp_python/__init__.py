@@ -1,10 +1,12 @@
 from pythonforandroid.recipe import CompiledComponentsPythonRecipe
+from os import environ
 
 class LlamaCppPythonRecipe(CompiledComponentsPythonRecipe):
     """
     Recipe for compiling llama-cpp-python.
-    This version uses the SKBUILD_CMAKE_ARGS variable to correctly
-    pass arguments to the scikit-build-core backend.
+    This version correctly identifies scikit-build-core as a build dependency
+    and disables incompatible native optimizations, plus strips any
+    stray '-march=native' from the toolchain flags.
     """
     
     version = '0.2.20'
@@ -12,12 +14,17 @@ class LlamaCppPythonRecipe(CompiledComponentsPythonRecipe):
     name = 'llama-cpp-python'
     
     depends = ['numpy', 'typing_extensions', 'diskcache', 'scikit-build-core']
-    
     site_packages_name = 'llama_cpp'
 
     def get_recipe_env(self, arch):
         env = super().get_recipe_env(arch)
-        
+
+        # --- Remove any '-march=native' accidentally injected by the NDK toolchain ---
+        for flag_var in ('CFLAGS', 'CXXFLAGS', 'LDFLAGS'):
+            if flag_var in env:
+                parts = env[flag_var].split()
+                env[flag_var] = ' '.join(p for p in parts if p != '-march=native')
+
         cmake_args = [
             '-DCMAKE_BUILD_TYPE=Release',
             '-DLLAMA_CUBLAS=OFF',
@@ -26,14 +33,13 @@ class LlamaCppPythonRecipe(CompiledComponentsPythonRecipe):
             '-DLLAMA_BUILD_SERVER=OFF',
             '-DLLAMA_BUILD_TESTS=OFF',
             '-DLLAMA_BUILD_EXAMPLES=OFF',
-            '-DLLAMA_NATIVE=OFF',  # Disable native optimizations
+            '-DLLAMA_NATIVE=OFF',      # disable llama.cpp's own native optimizations
         ]
-        
-        # --- THIS IS THE FIX ---
-        # Use the specific environment variable for scikit-build-core
-        env['SKBUILD_CMAKE_ARGS'] = ' '.join(cmake_args)
-        
+
+        env['CMAKE_ARGS'] = ' '.join(cmake_args)
+        # also export to the global environ so subprocesses see it
+        environ['CMAKE_ARGS'] = env['CMAKE_ARGS']
         return env
 
-# This line is essential
+# instantiate the recipe
 recipe = LlamaCppPythonRecipe()
