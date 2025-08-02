@@ -1,11 +1,10 @@
 from pythonforandroid.recipe import CompiledComponentsPythonRecipe
-from os import environ
 
 class LlamaCppPythonRecipe(CompiledComponentsPythonRecipe):
     """
     Recipe for compiling llama-cpp-python.
-    This version correctly identifies scikit-build-core as a build dependency
-    and disables incompatible native optimizations.
+    This version uses the SKBUILD_CMAKE_ARGS variable to correctly
+    pass arguments to the scikit-build-core backend.
     """
     
     version = '0.2.20'
@@ -27,13 +26,12 @@ class LlamaCppPythonRecipe(CompiledComponentsPythonRecipe):
             '-DLLAMA_BUILD_SERVER=OFF',
             '-DLLAMA_BUILD_TESTS=OFF',
             '-DLLAMA_BUILD_EXAMPLES=OFF',
-            # --- THIS IS THE FIX ---
-            # Disable native optimization flag that fails during cross-compilation
-            '-DLLAMA_NATIVE=OFF',
+            '-DLLAMA_NATIVE=OFF',  # Disable native optimizations
         ]
         
-        env['CMAKE_ARGS'] = ' '.join(cmake_args)
-        environ['CMAKE_ARGS'] = env['CMAKE_ARGS']
+        # --- THIS IS THE FIX ---
+        # Use the specific environment variable for scikit-build-core
+        env['SKBUILD_CMAKE_ARGS'] = ' '.join(cmake_args)
         
         return env
 
